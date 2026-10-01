@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Electricity Department — Grid Stability Monitoring</title>
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy2: #16263B;
+    --teal: #00B4D8;
+    --teal-light: #CAF0F8;
+    --amber: #FFB703;
+    --offwhite: #F4F7FA;
+    --gray: #5C6B7A;
+    --dark: #1B2733;
+    --red: #C1121F;
+    --green: #1B7A43;
+    --red-bg: #FDEBEC;
+    --green-bg: #EAF6F0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Calibri, sans-serif;
+    background: var(--offwhite); color: var(--dark);
+  }
+  header {
+    background: var(--navy); color: white; padding: 24px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+  header .sub { color: #AEC6DE; font-size: 13px; margin-top: 4px; }
+  .honesty-strip {
+    background: var(--navy2); color: #AEC6DE; font-size: 12px;
+    padding: 8px 32px; border-bottom: 1px solid #24405F;
+  }
+  main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
+  .row { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 10px; border: 1px solid #E1E8EF;
+    padding: 18px 20px; flex: 1; min-width: 200px;
+  }
+  .card .label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: .05em; }
+  .card .value { font-size: 30px; font-weight: 700; color: var(--navy); margin-top: 4px; }
+  .substation-card {
+    background: white; border-radius: 10px; border: 1px solid #E1E8EF;
+    padding: 16px 18px; flex: 1; min-width: 220px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+  .dot.up { background: var(--green); } .dot.down { background: var(--red); }
+  .substation-card .id { font-weight: 700; font-size: 15px; }
+  .substation-card .thr { color: var(--gray); font-size: 12px; margin-top: 4px; }
+  h2 { font-size: 16px; margin: 0 0 12px; color: var(--navy); }
+  button {
+    background: var(--teal); color: white; border: none; padding: 10px 18px;
+    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  button:hover { opacity: .9; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--gray); font-weight: 600; padding: 8px 10px; border-bottom: 2px solid #E1E8EF; }
+  td { padding: 8px 10px; border-bottom: 1px solid #EEF2F6; }
+  tr.mismatch { background: var(--red-bg); }
+  .badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.stable { background: var(--green-bg); color: var(--green); }
+  .badge.unstable { background: var(--red-bg); color: var(--red); }
+  .section { background: white; border-radius: 10px; border: 1px solid #E1E8EF; padding: 20px; margin-bottom: 24px; }
+  .case { border: 1px solid #E1E8EF; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; }
+  .case:hover { border-color: var(--teal); }
+  .case .verdict { font-weight: 700; color: var(--red); font-size: 13px; }
+  .case .meta { color: var(--gray); font-size: 12px; margin-top: 3px; }
+  .case-detail { display: none; margin-top: 10px; font-size: 12.5px; color: var(--dark); background: var(--offwhite); border-radius: 6px; padding: 10px 12px; white-space: pre-wrap; }
+  .case.open .case-detail { display: block; }
+  .empty { color: var(--gray); font-size: 13px; text-align: center; padding: 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Electricity Department — Grid Stability Monitoring</h1>
+    <div class="sub">Central aggregation across sub-distribution units</div>
+  </div>
+  <button onclick="runCycle()" id="runBtn">Run 10 simulated readings</button>
+</header>
+
+<div class="honesty-strip">
+  Prediction: tested (median filter + SVM) &nbsp;·&nbsp; Noise handling: tested (5-filter comparison) &nbsp;·&nbsp;
+  Investigation agent: reasoning unvalidated &nbsp;·&nbsp; Live grid connection: not connected — this is a simulation
+</div>
+
+<main>
+
+  <div class="row" id="statCards"></div>
+
+  <div class="section">
+    <h2>Sub-distribution units</h2>
+    <div class="row" id="substationCards"></div>
+  </div>
+
+  <div class="section">
+    <h2>Prediction stream (most recent)</h2>
+    <table>
+      <thead><tr><th>#</th><th>Substation</th><th>Predicted</th><th>Actual</th><th>P(unstable)</th><th>Result</th></tr></thead>
+      <tbody id="streamBody"></tbody>
+    </table>
+    <div class="empty" id="streamEmpty" style="display:none;">No predictions yet — click "Run simulated readings" above.</div>
+  </div>
+
+  <div class="section">
+    <h2>Investigated cases (auto-triggered on mismatch)</h2>
+    <div id="caseList"></div>
+    <div class="empty" id="caseEmpty" style="display:none;">No mismatches investigated yet.</div>
+  </div>
+
+</main>
+
+<script>
+async function refresh() {
+  const res = await fetch('/api/status');
+  const data = await res.json();
+
+  const subRes = await fetch('/api/substation-status');
+  const subs = await subRes.json();
+
+  // stat cards
+  const acc = data.accuracy !== null ? (data.accuracy * 100).toFixed(1) + '%' : '—';
+  document.getElementById('statCards').innerHTML = `
+    <div class="card"><div class="label">Total Predictions</div><div class="value">${data.total_predictions}</div></div>
+    <div class="card"><div class="label">Mismatches</div><div class="value">${data.total_mismatches}</div></div>
+    <div class="card"><div class="label">Live Accuracy (this session)</div><div class="value">${acc}</div></div>
+    <div class="card"><div class="label">Cases Investigated</div><div class="value">${data.case_files.length}</div></div>
+  `;
+
+  // substation cards
+  document.getElementById('substationCards').innerHTML = subs.map(s => `
+    <div class="substation-card">
+      <div class="id"><span class="dot ${s.reachable ? 'up' : 'down'}"></span>${s.id}</div>
+      <div class="thr">${s.reachable ? 'threshold = ' + s.threshold.toFixed(3) : 'unreachable'}</div>
+    </div>
+  `).join('');
+
+  // stream table
+  const rows = data.stream_log.slice().reverse();
+  document.getElementById('streamEmpty').style.display = rows.length ? 'none' : 'block';
+  document.getElementById('streamBody').innerHTML = rows.map(r => `
+    <tr class="${r.mismatch ? 'mismatch' : ''}">
+      <td>${r.idx}</td>
+      <td>${r.substation_id}</td>
+      <td><span class="badge ${r.predicted_label}">${r.predicted_label}</span></td>
+      <td><span class="badge ${r.actual_label}">${r.actual_label}</span></td>
+      <td>${(r.probability_unstable * 100).toFixed(1)}%</td>
+      <td>${r.mismatch ? '❌ mismatch' : '✅ correct'}</td>
+    </tr>
+  `).join('');
+
+  // case files
+  document.getElementById('caseEmpty').style.display = data.case_files.length ? 'none' : 'block';
+  document.getElementById('caseList').innerHTML = data.case_files.slice().reverse().map((c, i) => `
+    <div class="case" onclick="this.classList.toggle('open')">
+      <div class="verdict">${c.case_id} — ${c.error_type}</div>
+      <div class="meta">Substation ${c.substation_id} · predicted "${c.prediction.predicted_label}" · actual "${c.ground_truth.actual_label}"</div>
+      <div class="case-detail">${(c.report || '').replace(/</g,'&lt;')}</div>
+    </div>
+  `).join('');
+}
+
+async function runCycle() {
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true; btn.textContent = 'Running...';
+  await fetch('/api/run-cycle', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({n: 10, seed: Math.floor(Math.random() * 10000)})
+  });
+  await refresh();
+  btn.disabled = false; btn.textContent = 'Run 10 simulated readings';
+}
+
+refresh();
+</script>
+</body>
+</html>

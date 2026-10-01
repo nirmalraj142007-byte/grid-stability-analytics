@@ -1,0 +1,24 @@
+{
+  "n_samples": 10000,
+  "class_balance": {
+    "1": 0.638,
+    "0": 0.362
+  },
+  "cost_matrix": {
+    "FN_missed_instability": 10.0,
+    "FP_false_alarm": 1.0
+  },
+  "xgboost": {
+    "best_scale_pos_weight": 5,
+    "test_auc": 0.9904971076741891,
+    "cost_optimal_threshold": 0.56,
+    "expected_cost_default_thr": 0.124,
+    "expected_cost_optimal_thr": 0.1115
+  },
+  "svm": {
+    "best_class_weight_unstable": 5,
+    "test_auc": 0.9956972323732658,
+    "cost_optimal_threshold": 0.11,
+    "expected_cost_optimal_thr": 0.0865
+  }
+}

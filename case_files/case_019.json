@@ -1,0 +1,76 @@
+{
+  "sample_idx": 19,
+  "prediction": {
+    "predicted_label": "unstable",
+    "predicted_probability_unstable": 0.31634756645385387
+  },
+  "ground_truth": {
+    "actual_label": "stable"
+  },
+  "error_type": "False Positive (false alarm)",
+  "shap_evidence": [
+    {
+      "feature": "g1",
+      "value": 0.23075682168702116,
+      "shap_contribution": -1.458031177520752
+    },
+    {
+      "feature": "tau2",
+      "value": 7.339330138143425,
+      "shap_contribution": 1.4085086584091187
+    },
+    {
+      "feature": "tau3",
+      "value": 2.6191055818078173,
+      "shap_contribution": -1.2904635667800903
+    },
+    {
+      "feature": "g4",
+      "value": 0.277410390449493,
+      "shap_contribution": -1.1103734970092773
+    }
+  ],
+  "sensor_evidence": {
+    "largest_raw_vs_filtered_gaps": [
+      {
+        "feature": "tau2",
+        "raw": 7.742142637257999,
+        "filtered": 7.502978855906523,
+        "gap": 0.23916378135147554
+      },
+      {
+        "feature": "tau4",
+        "raw": 5.030459272114649,
+        "filtered": 5.183965068199516,
+        "gap": 0.15350579608486736
+      },
+      {
+        "feature": "p2",
+        "raw": -1.5763989395607323,
+        "filtered": -1.4917508849929484,
+        "gap": 0.0846480545677839
+      }
+    ],
+    "any_outlier_injected_in_window": true
+  },
+  "investigation": "[Deterministic fallback -- no ANTHROPIC_API_KEY or GROQ_API_KEY set] The model's prediction was most heavily driven by 'g1' (value=0.231, SHAP contribution=-1.458). The sensor-quality check found its largest raw-vs-filtered discrepancy on 'tau2' (gap=0.239), with an outlier spike present in the simulated reading window. This suggests the error is plausibly linked to noise on the dominant feature driving the prediction, though this is a rule-based summary, not an LLM-reasoned conclusion.",
+  "report": "CASE FILE \u2014 Sample #19\nVerdict: False Positive (false alarm)\n\nEvidence:\n- Model predicted 'unstable' (confidence: 31.6% unstable)\n- Actual outcome was 'stable'\n- Top driving feature: g1\n\nInvestigation notes:\n[Deterministic fallback -- no ANTHROPIC_API_KEY or GROQ_API_KEY set] The model's prediction was most heavily driven by 'g1' (value=0.231, SHAP contribution=-1.458). The sensor-quality check found its largest raw-vs-filtered discrepancy on 'tau2' (gap=0.239), with an outlier spike present in the simulated reading window. This suggests the error is plausibly linked to noise on the dominant feature driving the prediction, though this is a rule-based summary, not an LLM-reasoned conclusion.\n\nRecommended next action: Human reviewer to confirm sensor data quality for the flagged feature(s) before deciding whether retraining is warranted.",
+  "external_prediction": {
+    "predicted_label": "unstable",
+    "predicted_probability_unstable": 0.31634756645385387
+  },
+  "external_filtered_reading": {
+    "tau1": 8.874592436476183,
+    "tau2": 7.339330138143425,
+    "tau3": 2.6191055818078173,
+    "tau4": 5.1877937596856585,
+    "p1": 3.9292106047385316,
+    "p2": -1.5053001781984505,
+    "p3": -1.5610732789328856,
+    "p4": -0.916615113109542,
+    "g1": 0.23075682168702116,
+    "g2": 0.5568662965879219,
+    "g3": 0.3591757405456599,
+    "g4": 0.277410390449493
+  }
+}

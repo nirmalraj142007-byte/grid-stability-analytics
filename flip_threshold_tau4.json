@@ -1,0 +1,10 @@
+{
+  "top_feature": "tau4",
+  "feature_range_in_test": [
+    0.506109930316452,
+    9.99631500931721
+  ],
+  "approx_zero_crossings": [
+    3.25196454470437
+  ]
+}
